@@ -15,12 +15,18 @@ class UserController {
 
             event.preventDefault();
 
+            let btn = this._formEl.querySelector("[type=submit]");
+
+            btn.disabled = true;
+
             let values = this.getValues();
 
             this.getPhoto().then(
                 (content)=>{ 
                     values.photo = content;
                     this.addLine(values);
+                    this._formEl.reset();
+                    btn.disabled = false;
                 },
                 (e)=>{ 
                     console.error(e)
