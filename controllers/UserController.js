@@ -11,7 +11,7 @@ class UserController {
 
     onSubmit(){
 
-       this._formEl.addEventListener("submit", event=>{
+        this._formEl.addEventListener("submit", event=>{
 
             event.preventDefault();
 
@@ -20,7 +20,9 @@ class UserController {
             btn.disabled = true;
 
             let values = this.getValues();
-                
+
+            if (!values ) return false;
+
             this.getPhoto().then(
                 (content)=>{ 
                     values.photo = content;
@@ -72,9 +74,16 @@ class UserController {
     getValues(){
 
         let user = {};
+        let isValid = true;
 
         [...this._formEl.elements].forEach((field, index) => {
-            ;
+          
+            if (['name','email','password'].indexOf(field.name) > -1 && !field.value ) {
+
+               field.parentElement.classList.add('has-error')
+               isValid = false;
+            }
+
             if (field.name == "gender"){
               
                 if (field.checked) {
@@ -92,6 +101,10 @@ class UserController {
             }
 
         });
+
+        if (!isValid) {
+            return false;
+        }
 
           return new User(  
             user.name, 
