@@ -4,7 +4,7 @@ class Utils {
 
         let zero = (date.getMonth()+1 < 10) ? '0' : ''; 
         
-        return date.getDate()+'/'+zero+(date.getMonth()+1)+'/'+date.getFullYear();//+' '+date.getHours()+':'+date.getMinutes();
+        return date.getDate()+'/'+zero+(date.getMonth()+1)+'/'+date.getFullYear()+' '+date.getHours()+':'+date.getMinutes();
 
     }
 
