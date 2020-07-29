@@ -1,6 +1,6 @@
 class User {
 
-    constructor(name, gender, birth, country, email, password, admin){
+    constructor(name, gender, birth, country, email, password, photo, admin){
 
         this._name = name;
         this._gender = gender;
@@ -8,11 +8,12 @@ class User {
         this._country = country;
         this._email = email;
         this._password = password;
+        this._photo = photo;
         this._admin = admin;
         this._register = new Date();
 
     }
-
+    
     get register() {
         return this._register;
     }
@@ -39,6 +40,9 @@ class User {
 
     get password() {
         return this._password;
+    }
+    get photo (){
+        return this._photo;
     }
 
     get admin() {
