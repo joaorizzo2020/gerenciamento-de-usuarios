@@ -1228,6 +1228,11 @@ a:focus {
     background: #fff;
   }
 }
+/* Photo edit */
+.photo {
+max-height: 128px;
+padding-bottom: 12px;
+}
 /*
  * Component: Form
  * ---------------
