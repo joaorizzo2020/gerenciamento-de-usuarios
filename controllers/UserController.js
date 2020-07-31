@@ -8,6 +8,7 @@ class UserController {
 
         this.onSubmit();
         this.onEdit();
+        this.selectAll();
 
     }
 
@@ -63,7 +64,7 @@ class UserController {
                     
                     this.addEventsTr(tr);
                     this.updateCount();
-
+                    
                     this._formUpdateEl.reset();
                     btn.disabled = false;
                     this.showPanelCreate();
@@ -98,6 +99,7 @@ class UserController {
             this.getPhoto(this._formEl).then(
                 (content)=>{ 
                     values._photo = content;
+                    this.insertStorage(values);
                     this.addLine(values);
                     this._formEl.reset();
                     btn.disabled = false;
@@ -191,6 +193,44 @@ class UserController {
              
     }
 
+    getUsersStorage(){
+
+        let users = [];
+
+        if (sessionStorage.getItem("users")) {
+
+            users = JSON.parse(sessionStorage.getItem("users"));
+        }
+        return users;
+
+    }
+
+    selectAll(){
+
+            let users = this.getUsersStorage();
+
+            users.forEach(dataUser =>{
+
+                let user = new User();
+                
+                user.loadFromJASON(dataUser);
+
+                this.addLine(user);
+
+            });
+
+    }
+
+    insertStorage(data){
+
+        let users = this.getUsersStorage();
+
+        users.push(data);
+
+        sessionStorage.setItem("users", JSON.stringify(users));
+
+    }
+
     addLine(dataUser){
 
         let tr = document.createElement('tr');
@@ -198,11 +238,11 @@ class UserController {
         tr.dataset.user = JSON.stringify(dataUser);
 
         tr.innerHTML= `
-                <td><img src="${dataUser._photo}" alt="User Image" class="img-circle img-sm"></td>
-                <td>${dataUser._name}</td>
-                <td>${dataUser._email}</td>
-                <td>${(dataUser._admin) ? "Sim" : "Não" }</td>
-                <td>${Utils.dateFormat(dataUser._register)}</td>
+                <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
+                <td>${dataUser.name}</td>
+                <td>${dataUser.email}</td>
+                <td>${(dataUser.admin) ? "Sim" : "Não" }</td>
+                <td>${Utils.dateFormat(dataUser.register)}</td>
                 <td>
                     <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
                     <button type="button" class="btn btn-danger btn-delete btn-xs btn-flat">Excluir</button>
@@ -227,7 +267,7 @@ class UserController {
                 this.updateCount();         
             }
         });
-         
+
         tr.querySelector(".btn-edit").addEventListener("click", e=>{
 
             let json = JSON.parse(tr.dataset.user);

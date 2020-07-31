@@ -49,4 +49,22 @@ class User {
         return this._admin;
     }
 
+    loadFromJASON(json){
+
+        for (let name in json) {
+
+            switch(name){
+                case '_register':
+                    new Date(json[name]);
+                break;
+                
+                default:
+                this[name] = json[name];
+                break;
+            }
+               
+        }
+
+    }
+
 }
