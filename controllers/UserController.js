@@ -9,9 +9,9 @@ class UserController {
         this.onSubmit();
         this.onEdit();
         this.selectAll();
-
     }
-
+    
+    // Adds user data to the form so that it can be updated. Updates the counter and stores the data in the sessionStorage.
     onEdit(){
 
         document.querySelector("#box-user-update .btn-cancel").addEventListener("click", e=>{
@@ -46,40 +46,27 @@ class UserController {
                         result._photo = userOld._photo;
                     } else { 
                         result._photo = content;
-                    }    
+                    } 
 
-                    tr.dataset.user = JSON.stringify(result);
-                    
-                    tr.innerHTML= `
-                        <td><img src="${result._photo}" alt="User Image" class="img-circle img-sm"></td>
-                        <td>${result._name}</td>
-                        <td>${result._email}</td>
-                        <td>${(result._admin) ? "Sim" : "Não" }</td>
-                        <td>${Utils.dateFormat(result._register)}</td>
-                        <td>
-                            <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-                            <button type="button" class="btn btn-danger btn-delete btn-xs btn-flat">Excluir</button>
-                        </td>  
-                    `;
+                    let user = new User();
+                    user.loadFromJASON(result)
+                    this.getTr(user,tr);
                     
                     this.addEventsTr(tr);
                     this.updateCount();
-                    
                     this._formUpdateEl.reset();
                     btn.disabled = false;
-                    this.showPanelCreate();
 
+                    this.showPanelCreate();
                 },
                 (e)=>{ 
                     console.error(e)
                 }
             );
-
-            
         });
-
     }
 
+    // Submit button. The data sent to addLine() and inserted into the sessionStorage().
     onSubmit(){
 
         this._formEl.addEventListener("submit", event=>{
@@ -111,6 +98,7 @@ class UserController {
         });
     }
 
+    // Converting image file to base64.
     getPhoto(formEl){
 
         return new Promise((resolve, reject)=>{
@@ -140,11 +128,10 @@ class UserController {
             }else {
                 resolve('dist/img/boxed-bg.jpg');
             }
-        });
-
-       
+        }); 
     }
 
+    // Getting the form values ​​and returning to the User Object.
     getValues(formEl){
 
         let user = {};
@@ -180,7 +167,7 @@ class UserController {
             return false;
         }
 
-          return new User(  
+        return new User(  
             user.name, 
             user.gender, 
             user.birth, 
@@ -189,10 +176,10 @@ class UserController {
             user.password, 
             user.photo,
             user.admin
-          );
-             
+        );        
     }
 
+    // Check if there are already registered users in the Storage session and create an array of users.
     getUsersStorage(){
 
         let users = [];
@@ -202,25 +189,25 @@ class UserController {
             users = JSON.parse(sessionStorage.getItem("users"));
         }
         return users;
-
     }
 
+    // Returns stored data from the sessionStorage to the table.
     selectAll(){
 
-            let users = this.getUsersStorage();
+        let users = this.getUsersStorage();
 
-            users.forEach(dataUser =>{
+        users.forEach(dataUser =>{
 
-                let user = new User();
-                
-                user.loadFromJASON(dataUser);
+            let user = new User();
+            
+            user.loadFromJASON(dataUser);
 
-                this.addLine(user);
+            this.addLine(user);
 
-            });
-
+        });
     }
 
+    // Insert data into the sessionStorage.
     insertStorage(data){
 
         let users = this.getUsersStorage();
@@ -228,12 +215,24 @@ class UserController {
         users.push(data);
 
         sessionStorage.setItem("users", JSON.stringify(users));
-
     }
 
+    // Adds a new line "tr" to the table.
     addLine(dataUser){
 
-        let tr = document.createElement('tr');
+        let tr = this.getTr(dataUser);
+
+        this._tableEl.appendChild(tr);
+
+        this.updateCount();
+    }
+
+    // Create a new row in the "tr" table.
+    getTr(dataUser, tr = null){
+
+        if (tr === null) {
+            tr = document.createElement('tr');
+        }
 
         tr.dataset.user = JSON.stringify(dataUser);
 
@@ -248,15 +247,14 @@ class UserController {
                     <button type="button" class="btn btn-danger btn-delete btn-xs btn-flat">Excluir</button>
                 </td>  
         `;
-    
+
         this.addEventsTr(tr);
 
-        this._tableEl.appendChild(tr);
-
-        this.updateCount();
+        return tr;
 
     }
 
+    // Create a json by clicking on the edit button and returning the data to the update form.
     addEventsTr(tr){
 
         tr.querySelector(".btn-delete").addEventListener("click", e=>{
@@ -293,32 +291,33 @@ class UserController {
                         case 'checkbox':
                             field.checked = json[name];
                         break;
-
+                            
                         default:
                             field.value = json[name];
-
                     }
                 }
             }
+
             this._formUpdateEl.querySelector(".photo").src = json._photo;
             this.showPanelUpdate();
-
         });
-
     }
 
+    // Leave only the "user-create" form visible.
     showPanelCreate(){
 
         document.querySelector("#box-user-create").style.display ="block";
         document.querySelector("#box-user-update").style.display ="none";
     }
 
+    // Leave only the "user update" form visible.
     showPanelUpdate(){
 
         document.querySelector("#box-user-create").style.display ="none";
         document.querySelector("#box-user-update").style.display ="block";
     }
 
+    // Updates the number of users and administrators.
     updateCount(){
         
         let numberUsers =0;
@@ -340,5 +339,4 @@ class UserController {
         document.querySelector("#number-users-admin").innerHTML = numberAdmin;
 
     }
-
 }
