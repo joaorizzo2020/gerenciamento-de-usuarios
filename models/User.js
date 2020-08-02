@@ -124,4 +124,22 @@ class User {
 
         localStorage.setItem("users", JSON.stringify(users));
     }
+
+    // Delete users from the localStorage
+    remove(){
+
+        let users = User.getUsersStorage();
+
+         users.forEach((userData, index) => {
+
+            if (this._id == userData._id){
+
+                users.splice(index, 1);
+            }
+             
+         });
+
+         localStorage.setItem("users", JSON.stringify(users));
+
+    }
 }

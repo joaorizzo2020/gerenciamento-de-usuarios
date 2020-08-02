@@ -178,22 +178,10 @@ class UserController {
         );        
     }
 
-    // Check if there are already registered users in the Storage session and create an array of users.
-    getUsersStorage(){
-
-        let users = [];
-
-        if (localStorage.getItem("users")) {
-
-            users = JSON.parse(localStorage.getItem("users"));
-        }
-        return users;
-    }
-
     // Returns stored data from the localStorage to the table.
     selectAll(){
 
-       let users = this.getUsersStorage();
+       let users = User.getUsersStorage();
 
         users.forEach(dataUser =>{
 
@@ -247,9 +235,12 @@ class UserController {
     addEventsTr(tr){
 
         tr.querySelector(".btn-delete").addEventListener("click", e=>{
-
+            
             if (confirm("Deseja realmente excluir?")) {
 
+                let user = new User();
+                user.loadFromJASON(JSON.parse(tr.dataset.user));
+                user.remove();
                 tr.remove();
                 this.updateCount();         
             }
