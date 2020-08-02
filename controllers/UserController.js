@@ -11,7 +11,7 @@ class UserController {
         this.selectAll();
     }
     
-    // Adds user data to the form so that it can be updated. Updates the counter and stores the data in the sessionStorage.
+    // Adds user data to the form so that it can be updated. Updates the counter and stores the data in the localStorage.
     onEdit(){
 
         document.querySelector("#box-user-update .btn-cancel").addEventListener("click", e=>{
@@ -50,23 +50,22 @@ class UserController {
 
                     let user = new User();
                     user.loadFromJASON(result)
-                    this.getTr(user,tr);
-                    
+                    user.save(); 
+                    this.getTr(user,tr); 
                     this.addEventsTr(tr);
                     this.updateCount();
                     this._formUpdateEl.reset();
                     btn.disabled = false;
-
                     this.showPanelCreate();
-                },
-                (e)=>{ 
+
+                }, (e)=>{ 
                     console.error(e)
                 }
             );
         });
     }
 
-    // Submit button. The data sent to addLine() and inserted into the sessionStorage().
+    // Submit button. The data sent to addLine() and inserted into the localStorage().
     onSubmit(){
 
         this._formEl.addEventListener("submit", event=>{
@@ -86,7 +85,7 @@ class UserController {
             this.getPhoto(this._formEl).then(
                 (content)=>{ 
                     values._photo = content;
-                    this.insertStorage(values);
+                    values.save();
                     this.addLine(values);
                     this._formEl.reset();
                     btn.disabled = false;
@@ -184,17 +183,17 @@ class UserController {
 
         let users = [];
 
-        if (sessionStorage.getItem("users")) {
+        if (localStorage.getItem("users")) {
 
-            users = JSON.parse(sessionStorage.getItem("users"));
+            users = JSON.parse(localStorage.getItem("users"));
         }
         return users;
     }
 
-    // Returns stored data from the sessionStorage to the table.
+    // Returns stored data from the localStorage to the table.
     selectAll(){
 
-        let users = this.getUsersStorage();
+       let users = this.getUsersStorage();
 
         users.forEach(dataUser =>{
 
@@ -205,16 +204,6 @@ class UserController {
             this.addLine(user);
 
         });
-    }
-
-    // Insert data into the sessionStorage.
-    insertStorage(data){
-
-        let users = this.getUsersStorage();
-
-        users.push(data);
-
-        sessionStorage.setItem("users", JSON.stringify(users));
     }
 
     // Adds a new line "tr" to the table.
