@@ -181,15 +181,16 @@ class UserController {
     // Returns stored data from the localStorage to the table.
     selectAll(){
 
-       let users = User.getUsersStorage();
+       //let users = User.getUsersStorage();
 
-        users.forEach(dataUser =>{
+        HttpRequest.get('/users').then(data=>{
 
-            let user = new User();
-            
-            user.loadFromJASON(dataUser);
+            data.users.forEach(dataUser =>{
 
-            this.addLine(user);
+                let user = new User();
+                user.loadFromJASON(dataUser);
+                this.addLine(user);
+            });
 
         });
     }
