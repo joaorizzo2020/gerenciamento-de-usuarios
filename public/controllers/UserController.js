@@ -50,13 +50,16 @@ class UserController {
 
                     let user = new User();
                     user.loadFromJASON(result)
-                    user.save(); 
-                    this.getTr(user,tr); 
-                    this.addEventsTr(tr);
-                    this.updateCount();
-                    this._formUpdateEl.reset();
-                    btn.disabled = false;
-                    this.showPanelCreate();
+                    user.save().then(user => {
+
+                        this.getTr(user,tr); 
+                        this.addEventsTr(tr);
+                        this.updateCount();
+                        this._formUpdateEl.reset();
+                        btn.disabled = false;
+                        this.showPanelCreate();
+
+                    }); 
 
                 }, (e)=>{ 
                     console.error(e)
@@ -85,10 +88,12 @@ class UserController {
             this.getPhoto(this._formEl).then(
                 (content)=>{ 
                     values._photo = content;
-                    values.save();
-                    this.addLine(values);
-                    this._formEl.reset();
-                    btn.disabled = false;
+                    values.save().then(user => {
+
+                        this.addLine(user);
+                        this._formEl.reset();
+                        btn.disabled = false;
+                    });
                 },
                 (e)=>{ 
                     console.error(e)
@@ -181,9 +186,7 @@ class UserController {
     // Returns stored data from the localStorage to the table.
     selectAll(){
 
-       //let users = User.getUsersStorage();
-
-        HttpRequest.get('/users').then(data=>{
+        User.getUsersStorage().then(data=>{
 
             data.users.forEach(dataUser =>{
 
@@ -241,9 +244,11 @@ class UserController {
 
                 let user = new User();
                 user.loadFromJASON(JSON.parse(tr.dataset.user));
-                user.remove();
-                tr.remove();
-                this.updateCount();         
+                user.remove().then(data =>{
+                    
+                    tr.remove();
+                    this.updateCount();         
+                });
             }
         });
 

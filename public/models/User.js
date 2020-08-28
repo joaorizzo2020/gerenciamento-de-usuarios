@@ -64,82 +64,72 @@ class User {
                 break;
                 
                 default:
-                this[name] = json[name];
-                break;
-            }
-               
+                if (name.substring(0,1) === '_') {
+                    this[name] = json[name];   
+                }   
+            }     
         }
     }
 
     // Check if there are already registered users in the Storage session and create an array of users.
    static getUsersStorage(){
 
-        let users = [];
+       return HttpRequest.get('/users/');
 
-        if (localStorage.getItem("users")) {
-
-            users = JSON.parse(localStorage.getItem("users"));
-        }
-        return users;
     }
 
-    //  Generates the ID number.
-    getNewId() {
+    toJSON(){
 
-        let usersId = parseInt(localStorage.getItem("usersId"));
+        let json = {};
 
-        if (!usersId > 0) { 
-            usersId = 0; 
-        }
-        usersId++;
+        Object.keys(this).forEach(key=>{
 
-        localStorage.setItem("usersId", usersId);
+            if (this[key] !== undefined) {
 
-        return usersId;
+                json[key] = this[key]
+            }
+        });
+
+        return json;
     }
 
-    // Save user data to localStorage.
+    // Save user NeDB
     save(){
 
-        let users = User.getUsersStorage();
+        return new Promise((resolve,reject)=>{
 
-        if (this.id > 0) {
+        
+            let promise;
 
-            users.map(idUser => {
+            if (this.id) {
 
-                if (idUser._id === this.id) {
+            promise = HttpRequest.put(`/users/${this.id}`, this.toJSON());
 
-                    Object.assign(idUser, this);
-                }
-                return idUser ;
+            } else {
 
+                promise = HttpRequest.post('/users', this.toJSON());
+            }
+
+            promise.then(data => {
+
+                this.loadFromJASON(data);
+
+                resolve(this);
+
+            }).catch(e=>{
+
+                reject(e);
             });
-    
-        } else {
 
-            this._id = this.getNewId();
+        });
 
-            users.push(this);
-        }
 
-        localStorage.setItem("users", JSON.stringify(users));
     }
 
     // Delete users from the localStorage
     remove(){
 
-        let users = User.getUsersStorage();
-
-         users.forEach((userData, index) => {
-
-            if (this._id == userData._id){
-
-                users.splice(index, 1);
-            }
-             
-         });
-
-         localStorage.setItem("users", JSON.stringify(users));
+        return HttpRequest.delete(`/users/${this.id}`);
 
     }
 }
